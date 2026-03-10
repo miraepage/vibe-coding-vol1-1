@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>한글 놀이터 🌈</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8B5FBF 100%);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .rotate-notice {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            gap: 20px;
+        }
+        .rotate-notice .rotate-icon {
+            font-size: 80px;
+            animation: rotateHint 2s ease-in-out infinite;
+        }
+        @keyframes rotateHint {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        @media (orientation: portrait) {
+            .rotate-notice { display: flex; }
+            .container { display: none !important; }
+        }
+
+        .container {
+            width: 1920px;
+            height: 1080px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.12),
+                0 12px 24px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: 0 0;
+            position: absolute;
+        }
+
+        .subject-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+            gap: 4px;
+            position: relative;
+        }
+        .subject-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+        }
+        .sb-tab {
+            padding: 8px 30px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sb-tab.active {
+            background: white;
+            color: #1e3a8a;
+        }
+        .sb-tab.locked { cursor: default; }
+        .sb-tab .lock { font-size: 12px; opacity: 0.5; }
+        .sb-spacer { flex: 1; }
+        .sb-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .sb-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sb-btn:active { background: rgba(255,255,255,0.3); }
+        .sb-btn.muted { opacity: 0.5; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 14px;
+            padding: 14px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .profile-section {
+            background: linear-gradient(145deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+            border-radius: 20px;
+            padding: 20px;
+            border: 3px solid #fbbf24;
+            box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="15" cy="15" r="1.5" fill="white" opacity="0.4"><animate attributeName="opacity" values="0.4;0.15;0.4" dur="2s" repeatCount="indefinite"/></circle><circle cx="85" cy="25" r="1" fill="white" opacity="0.3"><animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.5s" repeatCount="indefinite"/></circle><circle cx="25" cy="75" r="1.2" fill="white" opacity="0.35"><animate attributeName="opacity" values="0.35;0.1;0.35" dur="1.8s" repeatCount="indefinite"/></circle><circle cx="70" cy="60" r="0.9" fill="white" opacity="0.25"><animate attributeName="opacity" values="0.25;0.08;0.25" dur="2.2s" repeatCount="indefinite"/></circle></svg>') repeat;
+            pointer-events: none;
+        }
+
+        .profile-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+            position: relative;
+            animation: avatarGlow 3s ease-in-out infinite;
+            flex-shrink: 0;
+            min-width: 90px;
+            min-height: 90px;
+            cursor: pointer;
+        }
+
+        @keyframes avatarGlow {
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .profile-info {
+            flex: 1;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .profile-name::before {
+            content: '👑';
+            font-size: 16px;
+            animation: crownShine 2s ease-in-out infinite;
+        }
+
+        @keyframes crownShine {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        .profile-level-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 8px 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-level {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fbbf24;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-badge {
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            border: 1px solid white;
+            animation: levelPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes levelPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+            background-size: 200% 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            animation: progressShine 2s linear infinite;
+        }
+
+        @keyframes progressShine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .saved-words-section {
+            background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+            border-radius: 16px;
+            padding: 14px;
+            border: 2px solid #0ea5e9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .saved-chars-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0c4a6e;
+            text-align: center;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .saved-chars-display {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+            scrollbar-width: thin;
+            scrollbar-color: #0ea5e9 transparent;
+        }
+
+        .saved-chars-display::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .saved-chars-display::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .saved-chars-display::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 2px;
+        }
+
+        .saved-word {
+            background: linear-gradient(145deg, #0ea5e9, #0284c7);
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+            flex-shrink: 0;
+            height: 50px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .saved-word:active {
+            background: linear-gradient(145deg, #0284c7, #0369a1);
+        }
+
+        .empty-saved {
+            color: #0ea5e9;
+            font-style: italic;
+            font-size: 20px;
+            text-align: center;
+            margin-top: 15px;
+            opacity: 0.7;
+        }
+
+        .control-buttons {
+            display: none;
+        }
+
+        .sound-toggle, .reset-btn {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+            height: 36px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reset-btn {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+        }
+
+        .sound-toggle.muted {
+            background: linear-gradient(145deg, #6b7280, #4b5563);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+        }
+
+        .sound-toggle:active, .reset-btn:active {
+            background: linear-gradient(145deg, #059669, #047857);
+        }
+
+        .reset-btn:active {
+            background: linear-gradient(145deg, #c82333, #b91c1c);
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        #keyboard-view {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .text-display {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 3px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 30px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            font-weight: 700;
+            flex-wrap: wrap;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.06),
+                0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .text-display:active {
+            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+            border-color: #cbd5e1;
+        }
+
+        .word-char {
+            color: #059669;
+            opacity: 0.9;
+            text-shadow: 0 2px 4px rgba(5, 150, 105, 0.1);
+        }
+
+        .current-char {
+            color: #dc2626;
+            text-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+        }
+
+        .input-area {
+            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
+            display: grid;
+            grid-template-columns: 1fr 3px 1fr;
+            gap: 18px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .consonant-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .consonant-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #3b82f6;
+            padding: 14px;
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-radius: 15px;
+            border: 2px solid #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .consonant-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .consonant-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 transparent;
+        }
+
+        .double-consonant-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+            padding: 14px;
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-radius: 15px;
+            border: 2px solid #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .double-consonant-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 transparent;
+        }
+
+        .consonant-grid::-webkit-scrollbar, .double-consonant-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .consonant-grid::-webkit-scrollbar-track, .double-consonant-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .consonant-grid::-webkit-scrollbar-thumb, .double-consonant-grid::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .divider {
+            background: linear-gradient(to bottom, #e2e8f0, #cbd5e1, #e2e8f0);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+        }
+
+        .vowel-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .vowel-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #f59e0b;
+            padding: 14px;
+            background: linear-gradient(145deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border: 2px solid #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .vowel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .vowel-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #f59e0b transparent;
+        }
+
+        .double-vowel-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #f59e0b;
+            padding: 14px;
+            background: linear-gradient(145deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border: 2px solid #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .double-vowel-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #f59e0b transparent;
+        }
+
+        .vowel-grid::-webkit-scrollbar, .double-vowel-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .vowel-grid::-webkit-scrollbar-track, .double-vowel-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .vowel-grid::-webkit-scrollbar-thumb, .double-vowel-grid::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 2px;
+        }
+
+        .char-btn {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            color: #1e293b;
+            touch-action: manipulation;
+            height: 75px;
+            min-height: 75px;
+            max-height: 75px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.5);
+            flex-shrink: 0;
+        }
+
+        .char-btn:active {
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-color: #3b82f6;
+        }
+
+        .char-btn.speaking {
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            border-color: #f59e0b;
+            box-shadow: 
+                0 4px 15px rgba(251, 191, 36, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .char-btn.empty {
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            border: 2px solid #cbd5e1;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 20px;
+            font-size: 42px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1;
+            min-height: 70px;
+            font-family: inherit;
+            color: white;
+            letter-spacing: 1px;
+        }
+        .action-btn .icon { font-size: 38px; opacity: 0.9; }
+        .action-btn:active { transform: scale(0.95); }
+
+        .action-btn.read {
+            background: linear-gradient(145deg, #06b6d4, #0891b2);
+            color: white;
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+        }
+
+        .action-btn.read:active {
+            background: linear-gradient(145deg, #0891b2, #0e7490);
+        }
+
+        .action-btn.complete {
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+       }
+
+       .action-btn.complete:active {
+           background: linear-gradient(145deg, #f59e0b, #d97706);
+       }
+
+        .action-btn.backspace {
+            background: linear-gradient(145deg, #f87171, #ef4444);
+            color: white;
+            box-shadow: 0 2px 8px rgba(248, 113, 113, 0.2);
+        }
+
+        .action-btn.backspace:active {
+            background: linear-gradient(145deg, #ef4444, #dc2626);
+        }
+
+       .action-btn:disabled {
+           background: linear-gradient(145deg, #e5e7eb, #d1d5db);
+           color: #9ca3af;
+           cursor: not-allowed;
+           box-shadow: none;
+       }
+
+       .action-btn:disabled:active {
+           background: linear-gradient(145deg, #e5e7eb, #d1d5db);
+       }
+
+      .character-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          z-index: 3000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          backdrop-filter: blur(10px);
+      }
+
+      .character-modal.hidden {
+          display: none;
+      }
+
+      .character-content {
+          background: white;
+          border-radius: 20px;
+          width: 90%;
+          max-width: 800px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      }
+
+      .character-header {
+          background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+          color: white;
+          padding: 20px;
+          border-radius: 20px 20px 0 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+
+      .character-header h3 {
+          margin: 0;
+          font-size: 18px;
+      }
+
+      .close-character {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .close-character:hover {
+          background: rgba(255,255,255,0.2);
+      }
+
+      .character-body {
+          padding: 20px;
+      }
+
+      .character-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+          gap: 15px;
+          max-height: 400px;
+          overflow-y: auto;
+      }
+
+      .character-item {
+          background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+          border: 2px solid #cbd5e1;
+          border-radius: 15px;
+          padding: 18px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 44px;
+          height: 95px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+      }
+
+      .character-item:hover {
+          background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+          border-color: #3b82f6;
+          transform: scale(1.05);
+      }
+
+      .character-item.selected {
+          background: linear-gradient(145deg, #fbbf24, #f59e0b);
+          border-color: #f59e0b;
+          color: #78350f;
+      }
+
+      .character-level {
+          font-size: 15px;
+          font-weight: 600;
+          color: #6b7280;
+      }
+
+      .levelup-animation {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.2) 100%);
+          z-index: 3000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: levelupFadeIn 0.5s ease-out;
+      }
+
+      @keyframes levelupFadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+      }
+
+      .levelup-content {
+          text-align: center;
+          position: relative;
+      }
+
+      .levelup-title {
+          font-size: 80px;
+          font-weight: 900;
+          background: linear-gradient(45deg, #fbbf24, #f59e0b, #ef4444, #8b5cf6, #06b6d4);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: rainbowText 2s ease-in-out infinite;
+          text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+          margin-bottom: 20px;
+      }
+
+      @keyframes rainbowText {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+      }
+
+      .levelup-subtitle {
+          font-size: 32px;
+          font-weight: 700;
+          color: white;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+          margin-bottom: 30px;
+      }
+
+      .levelup-character {
+          font-size: 120px;
+          animation: characterBounce 1s ease-in-out infinite;
+          margin: 20px 0;
+      }
+
+      @keyframes characterBounce {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.1); }
+      }
+
+      .firework {
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          animation: fireworkExplode 2s ease-out infinite;
+      }
+
+      .firework:nth-child(1) { background: #ff6b6b; left: 10%; top: 20%; animation-delay: 0s; }
+      .firework:nth-child(2) { background: #4ecdc4; right: 10%; top: 30%; animation-delay: 0.2s; }
+      .firework:nth-child(3) { background: #45b7d1; left: 20%; bottom: 20%; animation-delay: 0.4s; }
+      .firework:nth-child(4) { background: #f9ca24; right: 20%; bottom: 30%; animation-delay: 0.6s; }
+      .firework:nth-child(5) { background: #6c5ce7; left: 50%; top: 10%; animation-delay: 0.8s; }
+      .firework:nth-child(6) { background: #a29bfe; right: 50%; bottom: 10%; animation-delay: 1s; }
+
+      @keyframes fireworkExplode {
+          0% {
+              transform: scale(0);
+              opacity: 1;
+          }
+          50% {
+              transform: scale(20);
+              opacity: 0.8;
+          }
+          100% {
+              transform: scale(40);
+              opacity: 0;
+          }
+      }
+
+      .success-message {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0);
+          background: linear-gradient(145deg, #10b981, #059669);
+          color: white;
+          padding: 30px 50px;
+          border-radius: 25px;
+          font-size: 36px;
+          font-weight: 700;
+          z-index: 1001;
+          box-shadow: 
+              0 25px 50px rgba(16, 185, 129, 0.4),
+              0 15px 30px rgba(0,0,0,0.2);
+          animation: success-popup 2.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          text-align: center;
+          backdrop-filter: blur(10px);
+      }
+
+      @keyframes success-popup {
+          0% {
+              transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+              opacity: 0;
+          }
+          60% {
+              transform: translate(-50%, -50%) scale(1.15) rotate(10deg);
+              opacity: 1;
+          }
+          100% {
+              transform: translate(-50%, -50%) scale(1) rotate(0deg);
+              opacity: 1;
+          }
+      }
+
+      .star {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          background: linear-gradient(45deg, #fbbf24, #f59e0b);
+          clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+          animation: star-twinkle 1.2s ease-in-out infinite alternate;
+          box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+      }
+
+      @keyframes star-twinkle {
+          0% {
+              transform: scale(0.8) rotate(0deg);
+              opacity: 0.7;
+          }
+          100% {
+              transform: scale(1.3) rotate(180deg);
+              opacity: 1;
+          }
+      }
+
+      .rainbow-text {
+          background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24, #6c5ce7, #a29bfe);
+          background-size: 400% 400%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: rainbow-flow 2.5s ease-in-out infinite;
+      }
+
+      @keyframes rainbow-flow {
+          0%, 100% {
+              background-position: 0% 50%;
+          }
+          50% {
+              background-position: 100% 50%;
+          }
+      }
+
+      .touching {
+          background: linear-gradient(145deg, #dbeafe, #bfdbfe) !important;
+          border-color: #3b82f6 !important;
+      }
+
+  </style>
+</head>
+<body>
+  <div class="rotate-notice">
+      <div class="rotate-icon">📱</div>
+      <div>화면을 가로로 돌려주세요!</div>
+      <div style="font-size:14px;opacity:0.7;font-weight:400">가로 모드에서만 사용할 수 있어요</div>
+      <div style="font-size: 16px; opacity: 0.8;">가로 모드에서 사용할 수 있어요</div>
+  </div>
+
+  <div class="container">
+      <div class="subject-bar">
+          <button class="sb-tab active">📝 한글</button>
+          <div class="sb-spacer"></div>
+          <div class="sb-btns">
+              <button class="sb-btn" id="sb-sound" data-action="toggle-sound">🔊</button>
+          </div>
+      </div>
+
+      <div class="main-layout">
+          <div class="left-panel">
+              <div class="profile-section">
+                  <div class="profile-content">
+                      <div class="profile-avatar" onclick="showCharacterModal(event)">
+                          <span id="profile-character">🦸‍♂️</span>
+                      </div>
+                      <div class="profile-info">
+                          <div class="profile-name" onclick="changeUserName(event)">
+                              <span id="user-name">홍길동</span>
+                          </div>
+                          <div class="profile-level-container">
+                              <div class="profile-level">
+                                  <span class="level-badge">LV.<span id="user-level">1</span></span>
+                                  <span id="completed-count">0</span>/<span id="total-count">10</span>
+                              </div>
+                              <div class="progress-bar">
+                                  <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              
+                  <div class="saved-words-section">
+                      <div class="saved-chars-title">📝 내가 만든 글자</div>
+                      <div class="saved-chars-display" id="saved-chars-display">
+                          <div class="empty-saved">아직 글자가<br>없어요</div>
+                      </div>
+                  </div>
+          </div>
+
+          <div class="center-panel">
+              <div id="keyboard-view">
+              <div class="text-display" id="text-display">
+                  <span style="color: #94a3b8; font-size: 0.5em;">여기에 글자가 나타나요</span>
+              </div>
+
+              <div class="input-area">
+                  <div class="consonant-area">
+                      <div class="consonant-title">🔤 자음</div>
+                      
+                      <div class="consonant-content">
+                          <div class="consonant-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㄱ">ㄱ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄴ">ㄴ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄷ">ㄷ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄹ">ㄹ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅁ">ㅁ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅂ">ㅂ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅅ">ㅅ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅇ">ㅇ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅈ">ㅈ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅊ">ㅊ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅋ">ㅋ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅌ">ㅌ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅍ">ㅍ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅎ">ㅎ</button>
+                          </div>
+                          
+                          <div class="double-consonant-title">쌍자음</div>
+                          <div class="double-consonant-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㄲ">ㄲ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄸ">ㄸ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅃ">ㅃ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅆ">ㅆ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅉ">ㅉ</button>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="vowel-area">
+                      <div class="vowel-title">🎵 모음</div>
+                      
+                      <div class="vowel-content">
+                          <div class="vowel-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㅏ">ㅏ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅑ">ㅑ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅓ">ㅓ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅕ">ㅕ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅗ">ㅗ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅛ">ㅛ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅜ">ㅜ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅠ">ㅠ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅡ">ㅡ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅣ">ㅣ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅐ">ㅐ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅔ">ㅔ</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              </div> <!-- /keyboard-view -->
+
+          </div>
+          <div class="right-panel">
+              <button id="read-btn" class="action-btn read" data-action="read-text"><span class="icon">📢</span>읽어주기</button>
+              <button id="complete-btn" class="action-btn complete" data-action="complete-word" disabled><span class="icon">📝</span>단어완성</button>
+              <button id="backspace-btn" class="action-btn backspace" data-action="backspace" disabled><span class="icon">⌫</span>지우기</button>
+          </div>
+      </div>
+
+  </div>
+
+  <div id="character-modal" class="character-modal hidden">
+      <div class="character-content">
+          <div class="character-header">
+              <h3>🎭 캐릭터 선택</h3>
+              <button class="close-character" onclick="closeCharacterModal()">×</button>
+          </div>
+          <div class="character-body">
+              <div class="character-grid" id="character-grid">
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      let savedWords = [];
+      let currentWord = [];
+      let currentChar = {
+          choseong: '',
+          jungseong: '',
+          jongseong: ''
+      };
+      let soundEnabled = true;
+
+      const SFX = {
+        _ctx: null,
+        _getCtx() { if (!this._ctx) this._ctx = new (window.AudioContext || window.webkitAudioContext)(); return this._ctx; },
+        _play(fn) { try { if (!soundEnabled) return; fn(this._getCtx()); } catch(e) {} },
+        write() { this._play(ctx => { [523,659,784].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.06,ctx.currentTime+i*.07);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.07+.12);o.start(ctx.currentTime+i*.07);o.stop(ctx.currentTime+i*.07+.12); }); }); },
+        correct() { this._play(ctx => { [587,740,880].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.07,ctx.currentTime+i*.1);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.1+.15);o.start(ctx.currentTime+i*.1);o.stop(ctx.currentTime+i*.1+.15); }); }); },
+        wrong() { this._play(ctx => { [330,262].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.04,ctx.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.12+.2);o.start(ctx.currentTime+i*.12);o.stop(ctx.currentTime+i*.12+.2); }); }); },
+        fanfare() { this._play(ctx => { [523,659,784,1047].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.06,ctx.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.12+.25);o.start(ctx.currentTime+i*.12);o.stop(ctx.currentTime+i*.12+.25); }); }); },
+        levelup() { this._play(ctx => { [440,554,659,880].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.08,ctx.currentTime+i*.1);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.1+.3);o.start(ctx.currentTime+i*.1);o.stop(ctx.currentTime+i*.1+.3); }); }); },
+        combo(n) { this._play(ctx => { for(let i=0;i<Math.min(n,6);i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=523+i*80;g.gain.setValueAtTime(.05,ctx.currentTime+i*.06);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.06+.1);o.start(ctx.currentTime+i*.06);o.stop(ctx.currentTime+i*.06+.1);} }); },
+        gameStart() { this._play(ctx => { [392,523,659,784].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.04,ctx.currentTime+i*.1);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.1+.15);o.start(ctx.currentTime+i*.1);o.stop(ctx.currentTime+i*.1+.15); }); }); },
+        gameOver() { this._play(ctx => { [440,349,294,220].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.05,ctx.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.18+.3);o.start(ctx.currentTime+i*.18);o.stop(ctx.currentTime+i*.18+.3); }); }); },
+        pop() { this._play(ctx => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(800,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(200,ctx.currentTime+.15);g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.15);o.start(ctx.currentTime);o.stop(ctx.currentTime+.15); }); },
+        powerup() { this._play(ctx => { [784,988,1175,1568].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.06,ctx.currentTime+i*.08);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.08+.2);o.start(ctx.currentTime+i*.08);o.stop(ctx.currentTime+i*.08+.2); }); }); }
+      };
+
+      function showScorePopup(container, points, x, y) {
+        const el = document.createElement('div');
+        el.className = 'score-popup';
+        el.textContent = points;
+        el.style.left = x + 'px'; el.style.top = y + 'px';
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+      }
+
+      let _prevMainLevel = 1;
+
+      
+      let userStats = {
+          name: localStorage.getItem('userName') || '슈퍼히어로',
+          totalCompleted: parseInt(localStorage.getItem('totalCompleted')) || 0,
+          level: 1,
+          character: localStorage.getItem('userCharacter') || '🦸‍♂️'
+      };
+      
+
+      let bestKoreanVoice = null;
+      
+      function findBestKoreanVoice() {
+          const voices = window.speechSynthesis.getVoices();
+          if (!voices.length) return;
+          
+          const koreanVoices = voices.filter(v => v.lang.startsWith('ko'));
+          if (!koreanVoices.length) return;
+          
+          bestKoreanVoice = 
+              koreanVoices.find(v => v.name.includes('Google') && v.name.includes('한국')) ||
+              koreanVoices.find(v => v.name.includes('Google')) ||
+              koreanVoices.find(v => v.name.includes('Yuna')) ||
+              koreanVoices.find(v => v.name.includes('Sora')) ||
+              koreanVoices.find(v => v.default) ||
+              koreanVoices[0];
+          
+      }
+      
+      if (window.speechSynthesis) {
+          findBestKoreanVoice();
+          window.speechSynthesis.addEventListener('voiceschanged', findBestKoreanVoice);
+      }
+
+      const jamoPronounciation = {
+          'ㄱ':'기역','ㄲ':'쌍기역','ㄴ':'니은','ㄷ':'디귿','ㄸ':'쌍디귿',
+          'ㄹ':'리을','ㅁ':'미음','ㅂ':'비읍','ㅃ':'쌍비읍','ㅅ':'시옷',
+          'ㅆ':'쌍시옷','ㅇ':'이응','ㅈ':'지읒','ㅉ':'쌍지읒','ㅊ':'치읓',
+          'ㅋ':'키읔','ㅌ':'티읕','ㅍ':'피읖','ㅎ':'히읗',
+          'ㅏ':'아','ㅐ':'애','ㅑ':'야','ㅒ':'얘','ㅓ':'어','ㅔ':'에',
+          'ㅕ':'여','ㅖ':'예','ㅗ':'오','ㅘ':'와','ㅙ':'왜','ㅚ':'외',
+          'ㅛ':'요','ㅜ':'우','ㅝ':'워','ㅞ':'웨','ㅟ':'위','ㅠ':'유',
+          'ㅡ':'으','ㅢ':'의','ㅣ':'이'
+      };
+
+      function addToAudioQueue(text, button = null) {
+          if (!soundEnabled) return;
+
+          window.speechSynthesis.cancel();
+
+          document.querySelectorAll('.speaking').forEach(el => {
+              el.classList.remove('speaking');
+          });
+
+          if (button) {
+              button.classList.add('speaking');
+          }
+
+          const isJamo = text.length === 1 && jamoPronounciation[text];
+          const speakText = isJamo ? jamoPronounciation[text] : text;
+
+          const utterance = new SpeechSynthesisUtterance(speakText);
+          utterance.lang = 'ko-KR';
+          
+          if (bestKoreanVoice) {
+              utterance.voice = bestKoreanVoice;
+          }
+          
+          if (isJamo) {
+              utterance.rate = 0.75;   // 자모는 천천히
+              utterance.pitch = 1.15;  // 약간 높은 톤 (아이 친화)
+              utterance.volume = 1.0;  // 최대 볼륨
+          } else if (text.length <= 3) {
+              utterance.rate = 0.8;    // 짧은 단어
+              utterance.pitch = 1.1;
+              utterance.volume = 1.0;
+          } else {
+              utterance.rate = 0.85;   // 문장/긴 텍스트
+              utterance.pitch = 1.05;
+              utterance.volume = 1.0;
+          }
+
+          utterance.onend = () => {
+              if (button) button.classList.remove('speaking');
+          };
+
+          utterance.onerror = () => {
+              if (button) button.classList.remove('speaking');
+          };
+
+          window.speechSynthesis.speak(utterance);
+      }
+
+      function updateUserLevel() {
+          const oldLevel = userStats.level;
+          userStats.level = Math.floor(userStats.totalCompleted / 10) + 1;
+          
+          document.getElementById('user-name').textContent = userStats.name;
+          document.getElementById('user-level').textContent = userStats.level;
+          document.getElementById('completed-count').textContent = userStats.totalCompleted % 10;
+          document.getElementById('total-count').textContent = 10;
+          document.getElementById('profile-character').textContent = userStats.character;
+          
+          const progress = (userStats.totalCompleted % 10) * 10;
+          document.getElementById('progress-fill').style.width = progress + '%';
+          
+          localStorage.setItem('userName', userStats.name);
+          localStorage.setItem('totalCompleted', userStats.totalCompleted);
+          localStorage.setItem('userCharacter', userStats.character);
+          
+          if (oldLevel !== userStats.level && userStats.totalCompleted > 0) {
+              showLevelUpAnimation();
+          }
+          if (userStats.level > _prevMainLevel && _prevMainLevel > 0) SFX.levelup();
+          _prevMainLevel = userStats.level;
+      }
+
+      function showLevelUpAnimation() {
+          const animation = document.createElement('div');
+          animation.className = 'levelup-animation';
+          animation.innerHTML = `
+              <div class="levelup-content">
+                  <div class="levelup-title">LEVEL UP!</div>
+                  <div class="levelup-character">${userStats.character}</div>
+                  <div class="levelup-subtitle">레벨 ${userStats.level} 달성!</div>
+                  <div class="firework"></div>
+                  <div class="firework"></div>
+                  <div class="firework"></div>
+                  <div class="firework"></div>
+                  <div class="firework"></div>
+                  <div class="firework"></div>
+              </div>
+          `;
+          document.body.appendChild(animation);
+
+          setTimeout(() => {
+              if (animation.parentNode) {
+                  animation.parentNode.removeChild(animation);
+              }
+          }, 3000);
+
+          setTimeout(() => {
+              if (soundEnabled) {
+                  addToAudioQueue(`레벨 ${userStats.level} 달성! ${userStats.name} 최고야!`);
+              }
+          }, 500);
+      }
+
+      function changeUserName(event) {
+          event.stopPropagation();
+          const newName = prompt('멋진 이름을 입력해주세요:', userStats.name);
+          if (newName && newName.trim()) {
+              userStats.name = newName.trim();
+              updateUserLevel();
+          }
+      }
+
+      function isConsonant(char) {
+          const consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+          return consonants.includes(char);
+      }
+
+      function isVowel(char) {
+          const vowels = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+          return vowels.includes(char);
+      }
+
+      function resetCurrentInput() {
+          currentWord = [];
+          currentChar = {
+              choseong: '',
+              jungseong: '',
+              jongseong: ''
+          };
+          updateTextDisplay();
+          updateActionButtons();
+      }
+
+      async function addCharacterInput(char, button) {
+          addToAudioQueue(char, button);
+
+          if (isConsonant(char)) {
+              if (!currentChar.choseong) {
+                  currentChar.choseong = char;
+              } else if (currentChar.choseong && !currentChar.jungseong) {
+                  currentChar.choseong = char;
+              } else if (currentChar.choseong && currentChar.jungseong && !currentChar.jongseong) {
+                  currentChar.jongseong = char;
+              } else if (currentChar.choseong && currentChar.jungseong && currentChar.jongseong) {
+                  const doubleJongseong = combineJongseong(currentChar.jongseong, char);
+                  if (doubleJongseong) {
+                      currentChar.jongseong = doubleJongseong;
+                  } else {
+                      await completeCurrentChar();
+                      currentChar.choseong = char;
+                      currentChar.jungseong = '';
+                      currentChar.jongseong = '';
+                  }
+              }
+          } else if (isVowel(char)) {
+              if (currentChar.choseong && !currentChar.jungseong) {
+                  currentChar.jungseong = char;
+              } else if (currentChar.choseong && currentChar.jungseong && !currentChar.jongseong) {
+                  const doubleJungseong = combineJungseong(currentChar.jungseong, char);
+                  if (doubleJungseong) {
+                      currentChar.jungseong = doubleJungseong;
+                  } else {
+                      await completeCurrentChar();
+                      return;
+                  }
+              } else if (currentChar.choseong && currentChar.jungseong && currentChar.jongseong) {
+                  const splitResult = splitJongseong(currentChar.jongseong);
+                  if (splitResult.canSplit) {
+                      currentChar.jongseong = splitResult.first;
+                      await completeCurrentChar();
+                      currentChar.choseong = splitResult.second;
+                      currentChar.jungseong = char;
+                      currentChar.jongseong = '';
+                  } else {
+                      const jongseong = currentChar.jongseong;
+                      currentChar.jongseong = '';
+                      await completeCurrentChar();
+                      currentChar.choseong = jongseong;
+                      currentChar.jungseong = char;
+                  }
+              } else if (!currentChar.choseong) {
+                  return;
+              }
+          }
+
+          updateTextDisplay();
+          updateActionButtons();
+      }
+
+      function combineJungseong(first, second) {
+          const combinations = {
+              'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ',
+              'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ',
+              'ㅡㅣ': 'ㅢ', 'ㅑㅣ': 'ㅒ', 'ㅕㅣ': 'ㅖ'
+          };
+          
+          const key = first + second;
+          return combinations[key] || null;
+      }
+
+      async function completeCurrentChar() {
+          if (currentChar.choseong && currentChar.jungseong) {
+              const composed = composeCharacter(currentChar.choseong, currentChar.jungseong, currentChar.jongseong);
+              if (composed) {
+                  currentWord.push(composed);
+                  
+                  currentChar = {
+                      choseong: '',
+                      jungseong: '',
+                      jongseong: ''
+                  };
+              }
+          }
+      }
+
+      function combineJongseong(first, second) {
+          const combinations = {
+              'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ',
+              'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ',
+              'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ',
+              'ㄹㅎ': 'ㅀ', 'ㅂㅅ': 'ㅄ'
+          };
+          
+          const key = first + second;
+          return combinations[key] || null;
+      }
+
+      function splitJongseong(jongseong) {
+          const splits = {
+              'ㄳ': { first: 'ㄱ', second: 'ㅅ', canSplit: true },
+              'ㄵ': { first: 'ㄴ', second: 'ㅈ', canSplit: true },
+              'ㄶ': { first: 'ㄴ', second: 'ㅎ', canSplit: true },
+              'ㄺ': { first: 'ㄹ', second: 'ㄱ', canSplit: true },
+              'ㄻ': { first: 'ㄹ', second: 'ㅁ', canSplit: true },
+              'ㄼ': { first: 'ㄹ', second: 'ㅂ', canSplit: true },
+              'ㄽ': { first: 'ㄹ', second: 'ㅅ', canSplit: true },
+              'ㄾ': { first: 'ㄹ', second: 'ㅌ', canSplit: true },
+              'ㄿ': { first: 'ㄹ', second: 'ㅍ', canSplit: true },
+              'ㅀ': { first: 'ㄹ', second: 'ㅎ', canSplit: true },
+              'ㅄ': { first: 'ㅂ', second: 'ㅅ', canSplit: true }
+          };
+          
+          return splits[jongseong] || { canSplit: false };
+      }
+
+      function composeCharacter(choseong, jungseong, jongseong = '') {
+          const CHOSEONG_MAP = {
+              'ㄱ': 0, 'ㄲ': 1, 'ㄴ': 2, 'ㄷ': 3, 'ㄸ': 4, 'ㄹ': 5, 'ㅁ': 6,
+              'ㅂ': 7, 'ㅃ': 8, 'ㅅ': 9, 'ㅆ': 10, 'ㅇ': 11, 'ㅈ': 12, 'ㅉ': 13,
+              'ㅊ': 14, 'ㅋ': 15, 'ㅌ': 16, 'ㅍ': 17, 'ㅎ': 18
+          };
+          
+          const JUNGSEONG_MAP = {
+              'ㅏ': 0, 'ㅐ': 1, 'ㅑ': 2, 'ㅒ': 3, 'ㅓ': 4, 'ㅔ': 5, 'ㅕ': 6,
+              'ㅖ': 7, 'ㅗ': 8, 'ㅘ': 9, 'ㅙ': 10, 'ㅚ': 11, 'ㅛ': 12, 'ㅜ': 13,
+              'ㅝ': 14, 'ㅞ': 15, 'ㅟ': 16, 'ㅠ': 17, 'ㅡ': 18, 'ㅢ': 19, 'ㅣ': 20
+          };
+          
+          const JONGSEONG_MAP = {
+              '': 0, 'ㄱ': 1, 'ㄲ': 2, 'ㄳ': 3, 'ㄴ': 4, 'ㄵ': 5, 'ㄶ': 6,
+              'ㄷ': 7, 'ㄹ': 8, 'ㄺ': 9, 'ㄻ': 10, 'ㄼ': 11, 'ㄽ': 12,
+              'ㄾ': 13, 'ㄿ': 14, 'ㅀ': 15, 'ㅁ': 16, 'ㅂ': 17, 'ㅄ': 18,
+              'ㅅ': 19, 'ㅆ': 20, 'ㅇ': 21, 'ㅈ': 22, 'ㅊ': 23, 'ㅋ': 24, 'ㅌ': 25,
+              'ㅍ': 26, 'ㅎ': 27
+          };
+          
+          if (!choseong || !jungseong) {
+              return choseong + (jungseong || '') + (jongseong || '');
+          }
+          
+          if (!(choseong in CHOSEONG_MAP) || !(jungseong in JUNGSEONG_MAP)) {
+              return choseong + jungseong + (jongseong || '');
+          }
+          
+          if (jongseong && !(jongseong in JONGSEONG_MAP)) {
+              return choseong + jungseong + jongseong;
+          }
+          
+          try {
+              const code = 0xAC00 + 
+                          (CHOSEONG_MAP[choseong] * 588) + 
+                          (JUNGSEONG_MAP[jungseong] * 28) + 
+                          (JONGSEONG_MAP[jongseong] || 0);
+              return String.fromCharCode(code);
+          } catch (error) {
+              return choseong + jungseong + (jongseong || '');
+          }
+      }
+
+      function readCurrentText() {
+          const fullText = currentWord.join('') + getCurrentCharDisplay();
+          
+          if (fullText) {
+              addToAudioQueue(fullText);
+          } else {
+              addToAudioQueue('만들어진 글자가 없어요');
+          }
+      }
+
+      function toggleSound() {
+          soundEnabled = !soundEnabled;
+          const soundButton = document.querySelector('.sound-toggle');
+          const sbSound = document.getElementById('sb-sound');
+          
+          if (soundEnabled) {
+              if (soundButton) { soundButton.innerHTML = '🔊 소리'; soundButton.classList.remove('muted'); }
+              if (sbSound) { sbSound.textContent = '🔊'; sbSound.classList.remove('muted'); }
+          } else {
+              if (soundButton) { soundButton.innerHTML = '🔇 음소거'; soundButton.classList.add('muted'); }
+              if (sbSound) { sbSound.textContent = '🔇'; sbSound.classList.add('muted'); }
+              
+              window.speechSynthesis.cancel();
+              
+              document.querySelectorAll('.speaking').forEach(el => {
+                  el.classList.remove('speaking');
+              });
+          }
+      }
+
+      function updateSavedWordsDisplay() {
+          const display = document.getElementById('saved-chars-display');
+          
+          if (savedWords.length === 0) {
+              display.innerHTML = '<div class="empty-saved">저장된 단어가<br>없어요</div>';
+          } else {
+              display.innerHTML = savedWords.map(word => 
+                  `<div class="saved-word" data-action="speak-word" data-value="${word}">${word}</div>`
+              ).join('');
+          }
+      }
+
+      function updateTextDisplay() {
+          const display = document.getElementById('text-display');
+          let content = '';
+          
+          if (currentWord.length > 0) {
+              content += currentWord.map(char => 
+                  `<span class="word-char">${char}</span>`
+              ).join('');
+          }
+          
+          if (currentChar.choseong || currentChar.jungseong) {
+              const currentDisplay = getCurrentCharDisplay();
+              if (currentDisplay) {
+                  content += `<span class="current-char">${currentDisplay}</span>`;
+              }
+          }
+          
+          if (!content) {
+              content = '<span style="color: #94a3b8; font-size: 0.5em;">여기에 글자가 나타나요</span>';
+          }
+          
+          display.innerHTML = content;
+      }
+
+      function getCurrentCharDisplay() {
+            if (!currentChar.choseong) return '';
+            if (!currentChar.jungseong) return currentChar.choseong;
+            
+            if (currentChar.jongseong) {
+                const composed = composeCharacter(currentChar.choseong, currentChar.jungseong, currentChar.jongseong);
+                
+                if (composed === currentChar.choseong + currentChar.jungseong + currentChar.jongseong) {
+                    const baseChar = composeCharacter(currentChar.choseong, currentChar.jungseong, '');
+                    return baseChar + currentChar.jongseong;
+                }
+                
+                return composed;
+            }
+            
+            return composeCharacter(currentChar.choseong, currentChar.jungseong, '');
+        }
+
+      function updateActionButtons() {
+          const readBtn = document.getElementById('read-btn');
+          const backspaceBtn = document.getElementById('backspace-btn');
+          const completeBtn = document.getElementById('complete-btn');
+          
+          readBtn.disabled = false;
+          
+          if (currentWord.length > 0 || currentChar.choseong || currentChar.jungseong || currentChar.jongseong) {
+              backspaceBtn.disabled = false;
+          } else {
+              backspaceBtn.disabled = true;
+          }
+          
+          if (currentWord.length > 0 || (currentChar.choseong && currentChar.jungseong)) {
+              completeBtn.disabled = false;
+          } else {
+              completeBtn.disabled = true;
+          }
+      }
+
+      function backspace() {
+          addToAudioQueue('지웠어요');
+          
+          if (currentChar.jongseong) {
+              currentChar.jongseong = '';
+          } else if (currentChar.jungseong) {
+              currentChar.jungseong = '';
+          } else if (currentChar.choseong) {
+              currentChar.choseong = '';
+          } else if (currentWord.length > 0) {
+              currentWord.pop();
+          }
+          
+          updateTextDisplay();
+          updateActionButtons();
+      }
+
+      async function completeWord() {
+           if (currentChar.choseong && currentChar.jungseong) {
+               await completeCurrentChar();
+           }
+           
+           if (currentWord.length > 0) {
+               const wordString = currentWord.join('');
+               
+               addToAudioQueue(wordString);
+               
+               savedWords.push(wordString);
+                   localStorage.setItem('savedWords', JSON.stringify(savedWords));
+                   
+                   if (savedWords.length > 10) {
+                       savedWords.shift();
+                   }
+                   
+                   updateSavedWordsDisplay();
+                   showWordCompletionAnimation(wordString);
+                   
+                   setTimeout(() => {
+                       addToAudioQueue('잘했어요');
+                   }, 1500); // 단어 읽기가 끝난 후 격려
+                   
+                   resetCurrentInput();
+           }
+       }
+
+      function showWordCompletionAnimation(word) {
+          const successMessage = document.createElement('div');
+          successMessage.className = 'success-message';
+          successMessage.innerHTML = `<span class="rainbow-text">🎯 "${word}" 완성! 🎯</span>`;
+          document.body.appendChild(successMessage);
+
+          for (let i = 0; i < 12; i++) {
+              const star = document.createElement('div');
+              star.className = 'star';
+              star.style.left = Math.random() * 100 + '%';
+              star.style.top = Math.random() * 100 + '%';
+              star.style.animationDelay = Math.random() * 1.5 + 's';
+              document.body.appendChild(star);
+          }
+
+          setTimeout(() => {
+              if (successMessage.parentNode) {
+                  successMessage.parentNode.removeChild(successMessage);
+              }
+              document.querySelectorAll('.star').forEach(el => {
+                  if (el.parentNode) {
+                      el.parentNode.removeChild(el);
+                  }
+              });
+          }, 2500);
+      }
+
+      function reset() {
+          savedWords = [];
+          currentWord = [];
+          currentChar = {
+              choseong: '',
+              jungseong: '',
+              jongseong: ''
+          };
+          
+          updateSavedWordsDisplay();
+          updateTextDisplay();
+          updateActionButtons();
+      }
+
+      function speakCurrentDisplay() {
+          const display = document.getElementById('text-display');
+          const text = display.textContent.trim();
+          
+          if (text && text !== '여기에 글자가 나타나요') {
+              const fullText = currentWord.join('') + getCurrentCharDisplay();
+              if (fullText) {
+                  addToAudioQueue(fullText);
+              }
+          }
+      }
+
+      function handleAction(action, value, button) {
+          switch(action) {
+              case 'char-input':
+                  addCharacterInput(value, button);
+                  break;
+              case 'read-text':
+                  readCurrentText();
+                  break;
+              case 'backspace':
+                  backspace();
+                  break;
+              case 'complete-word':
+                  completeWord();
+                  break;
+              case 'speak-word':
+                  addToAudioQueue(value);
+                  break;
+                  case 'toggle-sound':
+                  toggleSound();
+                  break;
+              case 'reset':
+                  reset();
+                  break;
+          }
+      }
+
+      function setupEventListeners() {
+          document.addEventListener('click', function(e) {
+              const button = e.target.closest('[data-action]');
+              if (button && !button.disabled) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const action = button.getAttribute('data-action');
+                  const value = button.getAttribute('data-value') || button.getAttribute('data-tab') || button.getAttribute('data-index');
+                  handleAction(action, value, button);
+              }
+          });
+
+          document.getElementById('text-display').addEventListener('click', speakCurrentDisplay);
+
+          document.addEventListener('touchstart', function(e) {
+              const button = e.target.closest('[data-action]');
+              if (button && !button.disabled) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  button.classList.add('touching');
+              }
+          }, { passive: false });
+
+          document.addEventListener('touchend', function(e) {
+              const button = e.target.closest('[data-action]');
+              if (button && !button.disabled) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  button.classList.remove('touching');
+                  
+                  const action = button.getAttribute('data-action');
+                  const value = button.getAttribute('data-value') || button.getAttribute('data-tab') || button.getAttribute('data-index');
+                  handleAction(action, value, button);
+              }
+          }, { passive: false });
+
+          document.addEventListener('touchcancel', function(e) {
+              const buttons = document.querySelectorAll('[data-action].touching');
+              buttons.forEach(button => {
+                  button.classList.remove('touching');
+              });
+          });
+          
+          document.addEventListener('keydown', function(e) {
+              if (e.key === 'Escape') {
+                  closeCharacterModal();
+              }
+          });
+      }
+
+      document.addEventListener('touchmove', function(e) {
+          if (e.target.closest('.consonant-grid') || 
+              e.target.closest('.vowel-grid') ||
+              e.target.closest('.double-consonant-grid') ||
+              e.target.closest('.double-vowel-grid') ||
+              e.target.closest('.right-panel')) {
+              e.preventDefault();
+          }
+      }, { passive: false });
+
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function(e) {
+          const now = Date.now();
+          if (now - lastTouchEnd <= 300) {
+              e.preventDefault();
+          }
+          lastTouchEnd = now;
+      }, false);
+
+      document.addEventListener('DOMContentLoaded', function() {
+          function fitScale() {
+              const container = document.querySelector('.container');
+              if (!container || getComputedStyle(container).display === 'none') return;
+              const vp = window.visualViewport || {width: window.innerWidth, height: window.innerHeight};
+              const MARGIN = 0.03;
+              const availW = vp.width * (1 - MARGIN * 2);
+              const availH = vp.height * (1 - MARGIN * 2);
+              const scaleX = availW / 1920;
+              const scaleY = availH / 1080;
+              const scale = Math.min(scaleX, scaleY);
+              container.style.transform = `scale(${scale})`;
+              container.style.transformOrigin = '0 0';
+              container.style.left = ((vp.width - 1920 * scale) / 2) + 'px';
+              container.style.top = ((vp.height - 1080 * scale) / 2) + 'px';
+          }
+          fitScale();
+          window.addEventListener('resize', fitScale);
+          if (window.visualViewport) {
+              window.visualViewport.addEventListener('resize', fitScale);
+          }
+          const _sw = localStorage.getItem('savedWords');
+          if (_sw) { try { savedWords = JSON.parse(_sw); } catch(e) {} }
+          
+          updateSavedWordsDisplay();
+          updateTextDisplay();
+          updateActionButtons();
+          setupEventListeners();
+          
+          const _tc = parseInt(localStorage.getItem('totalCompleted')) || 0;
+          _prevMainLevel = Math.floor(_tc / 10) + 1;
+          updateUserLevel();
+
+
+      });
+
+  </script>
+</body>
+</html>

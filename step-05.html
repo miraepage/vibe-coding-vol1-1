@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>한글 놀이터 🌈</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8B5FBF 100%);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .rotate-notice {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            gap: 20px;
+        }
+        .rotate-notice .rotate-icon {
+            font-size: 80px;
+            animation: rotateHint 2s ease-in-out infinite;
+        }
+        @keyframes rotateHint {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        @media (orientation: portrait) {
+            .rotate-notice { display: flex; }
+            .container { display: none !important; }
+        }
+
+        .container {
+            width: 1920px;
+            height: 1080px;
+            background: white;
+            border-radius: 25px;
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.12),
+                0 12px 24px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: 0 0;
+            position: absolute;
+        }
+
+        .subject-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+            gap: 4px;
+            position: relative;
+        }
+        .subject-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+        }
+        .sb-tab {
+            padding: 8px 30px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sb-tab.active {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 14px;
+            padding: 14px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        .text-display {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 3px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 30px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            font-weight: 700;
+            flex-wrap: wrap;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.06),
+                0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+  <div class="rotate-notice">
+      <div class="rotate-icon">📱</div>
+      <div>화면을 가로로 돌려주세요!</div>
+      <div style="font-size:14px;opacity:0.7;font-weight:400">가로 모드에서만 사용할 수 있어요</div>
+      <div style="font-size: 16px; opacity: 0.8;">가로 모드에서 사용할 수 있어요</div>
+  </div>
+
+  <div class="container">
+      <div class="subject-bar">
+          <button class="sb-tab active">📝 한글</button>
+      </div>
+
+      <div class="main-layout">
+          <div class="left-panel">
+          </div>
+
+          <div class="center-panel">
+              <div class="text-display">
+                  <span style="color: #94a3b8; font-size: 0.5em;">여기에 글자가 나타나요</span>
+              </div>
+          </div>
+
+          <div class="right-panel">
+          </div>
+      </div>
+  </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          function fitScale() {
+              const container = document.querySelector('.container');
+              if (!container || getComputedStyle(container).display === 'none') return;
+              const vp = window.visualViewport || {width: window.innerWidth, height: window.innerHeight};
+              const MARGIN = 0.03;
+              const availW = vp.width * (1 - MARGIN * 2);
+              const availH = vp.height * (1 - MARGIN * 2);
+              const scaleX = availW / 1920;
+              const scaleY = availH / 1080;
+              const scale = Math.min(scaleX, scaleY);
+              container.style.transform = `scale(${scale})`;
+              container.style.transformOrigin = '0 0';
+              container.style.left = ((vp.width - 1920 * scale) / 2) + 'px';
+              container.style.top = ((vp.height - 1080 * scale) / 2) + 'px';
+          }
+          fitScale();
+          window.addEventListener('resize', fitScale);
+          if (window.visualViewport) window.visualViewport.addEventListener('resize', fitScale);
+      });
+  </script>
+</body>
+</html>

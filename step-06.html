@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>한글 놀이터 🌈</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8B5FBF 100%);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .rotate-notice {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            gap: 20px;
+        }
+        .rotate-notice .rotate-icon {
+            font-size: 80px;
+            animation: rotateHint 2s ease-in-out infinite;
+        }
+        @keyframes rotateHint {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        @media (orientation: portrait) {
+            .rotate-notice { display: flex; }
+            .container { display: none !important; }
+        }
+
+        .container {
+            width: 1920px;
+            height: 1080px;
+            background: white;
+            border-radius: 25px;
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.12),
+                0 12px 24px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: 0 0;
+            position: absolute;
+        }
+
+        .subject-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+            gap: 4px;
+            position: relative;
+        }
+        .subject-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+        }
+        .sb-tab {
+            padding: 8px 30px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sb-tab.active {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 14px;
+            padding: 14px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        #keyboard-view {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .text-display {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 3px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 30px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            font-weight: 700;
+            flex-wrap: wrap;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.06),
+                0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .input-area {
+            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
+            display: grid;
+            grid-template-columns: 1fr 3px 1fr;
+            gap: 18px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .consonant-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .consonant-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #3b82f6;
+            padding: 14px;
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-radius: 15px;
+            border: 2px solid #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .consonant-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .consonant-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 transparent;
+        }
+
+        .double-consonant-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+            padding: 14px;
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-radius: 15px;
+            border: 2px solid #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .double-consonant-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 transparent;
+        }
+
+        .consonant-grid::-webkit-scrollbar, .double-consonant-grid::-webkit-scrollbar { width: 4px; }
+        .consonant-grid::-webkit-scrollbar-track, .double-consonant-grid::-webkit-scrollbar-track { background: transparent; }
+        .consonant-grid::-webkit-scrollbar-thumb, .double-consonant-grid::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+
+        .divider {
+            background: linear-gradient(to bottom, #e2e8f0, #cbd5e1, #e2e8f0);
+            border-radius: 2px;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px; height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+        }
+
+        .vowel-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .vowel-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #f59e0b;
+            padding: 14px;
+            background: linear-gradient(145deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border: 2px solid #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .vowel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .vowel-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #f59e0b transparent;
+        }
+
+        .vowel-grid::-webkit-scrollbar { width: 4px; }
+        .vowel-grid::-webkit-scrollbar-track { background: transparent; }
+        .vowel-grid::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 2px; }
+
+        .char-btn {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            color: #1e293b;
+            touch-action: manipulation;
+            height: 75px;
+            min-height: 75px;
+            max-height: 75px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.5);
+            flex-shrink: 0;
+        }
+
+        .char-btn:active {
+            background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+            border-color: #3b82f6;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+  <div class="rotate-notice">
+      <div class="rotate-icon">📱</div>
+      <div>화면을 가로로 돌려주세요!</div>
+      <div style="font-size:14px;opacity:0.7;font-weight:400">가로 모드에서만 사용할 수 있어요</div>
+      <div style="font-size: 16px; opacity: 0.8;">가로 모드에서 사용할 수 있어요</div>
+  </div>
+
+  <div class="container">
+      <div class="subject-bar">
+          <button class="sb-tab active">📝 한글</button>
+      </div>
+
+      <div class="main-layout">
+          <div class="left-panel">
+          </div>
+
+          <div class="center-panel">
+              <div id="keyboard-view">
+              <div class="text-display" id="text-display">
+                  <span style="color: #94a3b8; font-size: 0.5em;">여기에 글자가 나타나요</span>
+              </div>
+
+              <div class="input-area">
+                  <div class="consonant-area">
+                      <div class="consonant-title">🔤 자음</div>
+                      <div class="consonant-content">
+                          <div class="consonant-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㄱ">ㄱ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄴ">ㄴ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄷ">ㄷ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄹ">ㄹ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅁ">ㅁ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅂ">ㅂ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅅ">ㅅ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅇ">ㅇ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅈ">ㅈ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅊ">ㅊ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅋ">ㅋ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅌ">ㅌ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅍ">ㅍ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅎ">ㅎ</button>
+                          </div>
+                          <div class="double-consonant-title">쌍자음</div>
+                          <div class="double-consonant-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㄲ">ㄲ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㄸ">ㄸ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅃ">ㅃ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅆ">ㅆ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅉ">ㅉ</button>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="vowel-area">
+                      <div class="vowel-title">🎵 모음</div>
+                      <div class="vowel-content">
+                          <div class="vowel-grid">
+                              <button class="char-btn" data-action="char-input" data-value="ㅏ">ㅏ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅑ">ㅑ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅓ">ㅓ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅕ">ㅕ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅗ">ㅗ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅛ">ㅛ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅜ">ㅜ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅠ">ㅠ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅡ">ㅡ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅣ">ㅣ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅐ">ㅐ</button>
+                              <button class="char-btn" data-action="char-input" data-value="ㅔ">ㅔ</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              </div>
+          </div>
+
+          <div class="right-panel">
+          </div>
+      </div>
+  </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          function fitScale() {
+              const container = document.querySelector('.container');
+              if (!container || getComputedStyle(container).display === 'none') return;
+              const vp = window.visualViewport || {width: window.innerWidth, height: window.innerHeight};
+              const MARGIN = 0.03;
+              const availW = vp.width * (1 - MARGIN * 2);
+              const availH = vp.height * (1 - MARGIN * 2);
+              const scaleX = availW / 1920;
+              const scaleY = availH / 1080;
+              const scale = Math.min(scaleX, scaleY);
+              container.style.transform = `scale(${scale})`;
+              container.style.transformOrigin = '0 0';
+              container.style.left = ((vp.width - 1920 * scale) / 2) + 'px';
+              container.style.top = ((vp.height - 1080 * scale) / 2) + 'px';
+          }
+          fitScale();
+          window.addEventListener('resize', fitScale);
+          if (window.visualViewport) window.visualViewport.addEventListener('resize', fitScale);
+      });
+  </script>
+</body>
+</html>
