@@ -1736,6 +1736,7 @@
       }
 
       async function addCharacterInput(char, button) {
+          SFX.write();
           addToAudioQueue(char, button);
 
           if (isConsonant(char)) {
@@ -1996,6 +1997,7 @@
       }
 
       function backspace() {
+          SFX.wrong();
           addToAudioQueue('지웠어요');
           
           if (currentChar.jongseong) {
