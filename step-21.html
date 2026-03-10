@@ -2028,6 +2028,8 @@
                        savedWords.shift();
                    }
                    
+                   userStats.totalCompleted++;
+                   updateUserLevel();
                    updateSavedWordsDisplay();
                    showWordCompletionAnimation(wordString);
                    
