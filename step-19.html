@@ -606,6 +606,8 @@
             background: linear-gradient(145deg, #dbeafe, #bfdbfe);
             border-color: #3b82f6;
         }
+        .consonant-area .char-btn { color: #3b82f6; }
+        .vowel-area .char-btn { color: #b45309; }
 
         .char-btn.speaking {
             background: linear-gradient(145deg, #fbbf24, #f59e0b);
@@ -1273,7 +1275,6 @@
                   </div>
               </div>
 
-
           </div>
           <div class="right-panel">
               <button id="read-btn" class="action-btn read" data-action="read-text"><span class="icon">📢</span>읽어주기</button>
@@ -1333,9 +1334,37 @@
               </div>
           </div>
       </div>
+      <div id="game-pause-screen" class="game-pause-screen hidden">
+          <div class="game-pause-content">
+              <div class="game-pause-title">⏸ 일시정지</div>
+              <button class="game-retry-btn" onclick="toggleGamePause()">▶ 이어하기</button>
+              <button class="game-exit-btn" onclick="exitFallingGame()">🏠 나가기</button>
+          </div>
+      </div>
+      <div id="game-settings-screen" class="game-settings-screen hidden">
+          <div class="game-settings-content">
+              <div class="game-settings-title">⚙ 설정</div>
+              <div class="game-setting-item">
+                  <label>속도</label>
+                  <div class="speed-btns">
+                      <button class="speed-btn active" onclick="setGameSpeed(1)">🐢 느리게</button>
+                      <button class="speed-btn" onclick="setGameSpeed(2)">🐇 보통</button>
+                      <button class="speed-btn" onclick="setGameSpeed(3)">🚀 빠르게</button>
+                  </div>
+              </div>
+              <div class="game-setting-item">
+                  <label>글자 종류</label>
+                  <div class="speed-btns">
+                      <button class="type-btn active" onclick="setGameType('simple')">쉬운 글자</button>
+                      <button class="type-btn" onclick="setGameType('medium')">보통 글자</button>
+                      <button class="type-btn" onclick="setGameType('hard')">어려운 단어</button>
+                  </div>
+              </div>
+              <button class="game-retry-btn" onclick="closeGameSettings()">✓ 확인</button>
+          </div>
+      </div>
   </div>
 
-  
   <div id="character-modal" class="character-modal hidden">
       <div class="character-content">
           <div class="character-header">
@@ -1349,7 +1378,6 @@
       </div>
   </div>
 </div>
-
 
   <script>
       let savedWords = [];
@@ -1374,7 +1402,6 @@
         gameOver() { this._play(ctx => { [440,349,294,220].forEach((f,i) => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.05,ctx.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.18+.3);o.start(ctx.currentTime+i*.18);o.stop(ctx.currentTime+i*.18+.3); }); }); },
         pop() { this._play(ctx => { const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(800,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(200,ctx.currentTime+.15);g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.15);o.start(ctx.currentTime);o.stop(ctx.currentTime+.15); }); },
       };
-
 
       let _prevMainLevel = 1;
 
@@ -1467,15 +1494,15 @@
           }
           
           if (isJamo) {
-              utterance.rate = 0.75;   // 자모는 천천히
-              utterance.pitch = 1.15;  // 약간 높은 톤 (아이 친화)
-              utterance.volume = 1.0;  // 최대 볼륨
+              utterance.rate = 0.75;
+              utterance.pitch = 1.15;
+              utterance.volume = 1.0;
           } else if (text.length <= 3) {
-              utterance.rate = 0.8;    // 짧은 단어
+              utterance.rate = 0.8;
               utterance.pitch = 1.1;
               utterance.volume = 1.0;
           } else {
-              utterance.rate = 0.85;   // 문장/긴 텍스트
+              utterance.rate = 0.85;
               utterance.pitch = 1.05;
               utterance.volume = 1.0;
           }
@@ -1601,7 +1628,6 @@
           modal.classList.add('hidden');
       }
 
-
       function isConsonant(char) {
           const consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
           return consonants.includes(char);
@@ -1611,7 +1637,6 @@
           const vowels = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
           return vowels.includes(char);
       }
-
 
       function resetCurrentInput() {
           currentWord = [];
@@ -1623,7 +1648,6 @@
           updateTextDisplay();
           updateActionButtons();
       }
-
 
       async function addCharacterInput(char, button) {
           addToAudioQueue(char, button);
@@ -1878,7 +1902,7 @@
               backspaceBtn.disabled = true;
           }
           
-          if (currentWord.length > 0 || (currentChar.choseong && currentChar.jungseong)) {
+          if (currentWord.length >= 1) {
               completeBtn.disabled = false;
           } else {
               completeBtn.disabled = true;
@@ -2108,7 +2132,6 @@
           _prevMainLevel = Math.floor(_tc / 10) + 1;
           updateUserLevel();
 
-
           const _hb = parseInt(localStorage.getItem('hangulHeroBest')) || 0;
           if (_hb > 0) {
               const bd = document.getElementById('hero-best-display');
@@ -2298,8 +2321,6 @@
           });
       }
 
-
-
       function moveChars() {
           const arena = document.getElementById('game-arena');
           const groundY = arena.offsetHeight * 0.88;
@@ -2324,10 +2345,8 @@
           });
       }
 
-
       function gameKeyPress(char) {
       }
-
 
       function updateGameBackground() {
           const arena = document.getElementById('game-arena');
@@ -2351,7 +2370,6 @@
           document.getElementById('game-hearts').textContent = hearts;
       }
 
-
       function exitFallingGame() {
           document.getElementById('game-pause-screen').classList.add('hidden');
           document.getElementById('game-settings-screen').classList.add('hidden');
@@ -2366,7 +2384,6 @@
           
           document.getElementById('falling-game').classList.add('hidden');
       }
-
 
   
 

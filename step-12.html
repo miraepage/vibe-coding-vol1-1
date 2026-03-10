@@ -249,7 +249,6 @@
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
         }
 
-
         .sound-toggle:active, .reset-btn:active {
             background: linear-gradient(145deg, #059669, #047857);
         }
@@ -507,6 +506,8 @@
             background: linear-gradient(145deg, #dbeafe, #bfdbfe);
             border-color: #3b82f6;
         }
+        .consonant-area .char-btn { color: #3b82f6; }
+        .vowel-area .char-btn { color: #b45309; }
 
         .char-btn.speaking {
             background: linear-gradient(145deg, #fbbf24, #f59e0b);
@@ -810,7 +811,6 @@
         setTimeout(() => el.remove(), 900);
       }
 
-
       
       let bestKoreanVoice = null;
       
@@ -871,15 +871,15 @@
           }
           
           if (isJamo) {
-              utterance.rate = 0.75;   // 자모는 천천히
-              utterance.pitch = 1.15;  // 약간 높은 톤 (아이 친화)
-              utterance.volume = 1.0;  // 최대 볼륨
+              utterance.rate = 0.75;
+              utterance.pitch = 1.15;
+              utterance.volume = 1.0;
           } else if (text.length <= 3) {
-              utterance.rate = 0.8;    // 짧은 단어
+              utterance.rate = 0.8;
               utterance.pitch = 1.1;
               utterance.volume = 1.0;
           } else {
-              utterance.rate = 0.85;   // 문장/긴 텍스트
+              utterance.rate = 0.85;
               utterance.pitch = 1.05;
               utterance.volume = 1.0;
           }
@@ -1149,7 +1149,7 @@
               backspaceBtn.disabled = true;
           }
           
-          if (currentWord.length > 0 || (currentChar.choseong && currentChar.jungseong)) {
+          if (currentWord.length >= 1) {
               completeBtn.disabled = false;
           } else {
               completeBtn.disabled = true;
@@ -1368,7 +1368,6 @@
           updateActionButtons();
           setupEventListeners();
           
-
 
       });
 
