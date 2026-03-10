@@ -1429,8 +1429,8 @@
                   <div class="firework"></div>
               </div>
           `;
-          document.querySelector(".container").appendChild(animation);
-          
+          document.body.appendChild(animation);
+
           setTimeout(() => {
               if (animation.parentNode) {
                   animation.parentNode.removeChild(animation);
