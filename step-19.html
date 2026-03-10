@@ -1035,6 +1035,24 @@
           transition: all 0.25s ease;
       }
 
+      .cho-indicator {
+          display: none;
+          position: absolute;
+          top: -12px;
+          right: -8px;
+          background: #3b82f6;
+          color: white;
+          font-size: 16px;
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 10px;
+          border: 2px solid white;
+          box-shadow: 0 2px 8px rgba(59,130,246,0.4);
+      }
+      .falling-char.cho-match .cho-indicator {
+          display: block;
+      }
+
       .game-cloud,.hg-cloud{position:absolute;opacity:.25;pointer-events:none;animation:cloudFloat 20s linear infinite;z-index:1}
       @keyframes cloudFloat{0%{transform:translateX(-100px)}100%{transform:translateX(2020px)}}
       .hg-deco{position:absolute;pointer-events:none;z-index:1;opacity:0.08;animation:decoFloat var(--dur,6s) ease-in-out infinite}
