@@ -55,7 +55,7 @@
 
         @media (orientation: portrait) {
             .rotate-notice { display: flex; }
-            .container { display: none !important; }
+            .container { position: relative; display: none !important; }
         }
 
         .container {
@@ -743,7 +743,7 @@
        }
 
       .character-modal {
-          position: fixed;
+          position: absolute;
           top: 0;
           left: 0;
           width: 100%;
@@ -851,7 +851,7 @@
       }
 
       .success-message {
-          position: fixed;
+          position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%) scale(0);
@@ -1052,8 +1052,7 @@
           </div>
       </div>
 
-  </div>
-
+  
   <div id="character-modal" class="character-modal hidden">
       <div class="character-content">
           <div class="character-header">
@@ -1066,6 +1065,7 @@
           </div>
       </div>
   </div>
+</div>
 
   <script>
       let savedWords = [];
@@ -1552,7 +1552,7 @@
           const successMessage = document.createElement('div');
           successMessage.className = 'success-message';
           successMessage.innerHTML = `<span class="rainbow-text">🎯 "${word}" 완성! 🎯</span>`;
-          document.body.appendChild(successMessage);
+          document.querySelector(".container").appendChild(successMessage);
 
           for (let i = 0; i < 12; i++) {
               const star = document.createElement('div');
@@ -1560,7 +1560,7 @@
               star.style.left = Math.random() * 100 + '%';
               star.style.top = Math.random() * 100 + '%';
               star.style.animationDelay = Math.random() * 1.5 + 's';
-              document.body.appendChild(star);
+              document.querySelector(".container").appendChild(star);
           }
 
           setTimeout(() => {

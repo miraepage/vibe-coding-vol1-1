@@ -55,7 +55,7 @@
 
         @media (orientation: portrait) {
             .rotate-notice { display: flex; }
-            .container { display: none !important; }
+            .container { position: relative; display: none !important; }
         }
 
         .container {
@@ -694,7 +694,7 @@
        }
 
       .character-modal {
-          position: fixed;
+          position: absolute;
           top: 0;
           left: 0;
           width: 100%;
@@ -1071,9 +1071,7 @@
   <div id="falling-game" class="falling-game hidden">
   </div>
 
-  </div>
-
-
+  
   <div id="character-modal" class="character-modal hidden">
       <div class="character-content">
           <div class="character-header">
@@ -1086,6 +1084,8 @@
           </div>
       </div>
   </div>
+</div>
+
 
   <script>
       let savedWords = [];
@@ -1274,7 +1274,7 @@
                   <div class="firework"></div>
               </div>
           `;
-          document.body.appendChild(animation);
+          document.querySelector(".container").appendChild(animation);
           
           setTimeout(() => {
               if (animation.parentNode) {
@@ -1670,7 +1670,7 @@
           const successMessage = document.createElement('div');
           successMessage.className = 'success-message';
           successMessage.innerHTML = `<span class="rainbow-text">🎯 "${word}" 완성! 🎯</span>`;
-          document.body.appendChild(successMessage);
+          document.querySelector(".container").appendChild(successMessage);
 
           for (let i = 0; i < 12; i++) {
               const star = document.createElement('div');
@@ -1678,7 +1678,7 @@
               star.style.left = Math.random() * 100 + '%';
               star.style.top = Math.random() * 100 + '%';
               star.style.animationDelay = Math.random() * 1.5 + 's';
-              document.body.appendChild(star);
+              document.querySelector(".container").appendChild(star);
           }
 
           setTimeout(() => {
