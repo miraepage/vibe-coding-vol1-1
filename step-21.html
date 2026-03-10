@@ -2692,6 +2692,7 @@
           const arena = document.getElementById('game-arena');
           const ef = document.createElement('div');
           ef.textContent = `${combo} COMBO!`;
+          ef.className = 'combo-effect';
           ef.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:70px;font-weight:900;color:#f59e0b;text-shadow:0 4px 8px rgba(0,0,0,0.3);z-index:50;pointer-events:none;animation:comboPopAnim 1s ease-out forwards;';
           arena.appendChild(ef);
           setTimeout(() => ef.remove(), 1000);
