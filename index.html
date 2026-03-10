@@ -2364,10 +2364,11 @@
           updateGameBackground();
           addClouds();
 
+          const arena = document.getElementById('game-arena');
           const cd = document.createElement('div');
           cd.className = 'hero-countdown';
           cd.innerHTML = '<div class="hero-cd-num">3</div>';
-          game.appendChild(cd);
+          arena.appendChild(cd);
           SFX.pop();
 
           let count = 3;
@@ -2863,7 +2864,7 @@
           const cd = document.createElement('div');
           cd.className = 'hero-countdown';
           cd.innerHTML = '<div class="hero-cd-num">3</div>';
-          document.getElementById('falling-game').appendChild(cd);
+          document.getElementById('game-arena').appendChild(cd);
           SFX.pop();
 
           let count = 3;
